@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-export default function ConstellationCanvas() {
+export default function ConstellationCanvas({ theme = 'light' }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -15,9 +15,9 @@ export default function ConstellationCanvas() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', onResize, { passive: true });
 
-    const mouse = { x: -1000, y: -1000, radius: 170 };
+    const mouse = { x: -1000, y: -1000, radius: 140 };
 
     const onMouseMove = (e) => {
       mouse.x = e.clientX;
@@ -28,21 +28,25 @@ export default function ConstellationCanvas() {
       mouse.y = -1000;
     };
 
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
     window.addEventListener('mouseleave', onMouseLeave);
 
-    // Generate responsive particle density
-    const particleCount = Math.min(95, Math.floor((width * height) / 14000));
+    const isLight = theme === 'light';
+    const particleCount = Math.min(65, Math.floor((width * height) / 22000));
     const particles = [];
+
+    const pColor1 = isLight ? '#2563eb' : '#00d2ff';
+    const pColor2 = isLight ? '#0284c7' : '#3b82f6';
+    const lineColor = isLight ? '37, 99, 235' : '0, 210, 255';
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.7,
-        vy: (Math.random() - 0.5) * 0.7,
-        baseRadius: Math.random() * 1.8 + 1,
-        color: Math.random() > 0.3 ? '#00f0ff' : '#0077ff'
+        vx: (Math.random() - 0.5) * 0.45,
+        vy: (Math.random() - 0.5) * 0.45,
+        baseRadius: Math.random() * 1.5 + 0.8,
+        color: Math.random() > 0.4 ? pColor1 : pColor2
       });
     }
 
@@ -50,64 +54,55 @@ export default function ConstellationCanvas() {
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw particle connections & mouse connections
       for (let i = 0; i < particles.length; i++) {
         const p1 = particles[i];
 
-        // Move particles
         p1.x += p1.vx;
         p1.y += p1.vy;
 
-        // Bounce on boundary
         if (p1.x < 0 || p1.x > width) p1.vx *= -1;
         if (p1.y < 0 || p1.y > height) p1.vy *= -1;
 
-        // Interaction with mouse cursor
         const dxMouse = mouse.x - p1.x;
         const dyMouse = mouse.y - p1.y;
         const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
 
         if (distMouse < mouse.radius) {
-          const force = (1 - distMouse / mouse.radius) * 1.8;
-          // Gentle attraction & glow
-          p1.x += (dxMouse / distMouse) * force * 0.8;
-          p1.y += (dyMouse / distMouse) * force * 0.8;
+          const force = (1 - distMouse / mouse.radius) * 1.2;
+          p1.x += (dxMouse / distMouse) * force * 0.5;
+          p1.y += (dyMouse / distMouse) * force * 0.5;
 
-          // Connect laser line to mouse
           ctx.beginPath();
           ctx.moveTo(p1.x, p1.y);
           ctx.lineTo(mouse.x, mouse.y);
-          ctx.strokeStyle = `rgba(0, 240, 255, ${(1 - distMouse / mouse.radius) * 0.45})`;
-          ctx.lineWidth = 0.8;
+          ctx.strokeStyle = `rgba(${lineColor}, ${(1 - distMouse / mouse.radius) * (isLight ? 0.25 : 0.4)})`;
+          ctx.lineWidth = 0.7;
           ctx.stroke();
         }
 
-        // Connect nearby particles
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j];
           const dx = p1.x - p2.x;
           const dy = p1.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
 
-          if (dist < 120) {
-            const alpha = (1 - dist / 120) * 0.22;
+          if (dist < 110) {
+            const alpha = (1 - dist / 110) * (isLight ? 0.12 : 0.18);
             ctx.beginPath();
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(0, 150, 255, ${alpha})`;
-            ctx.lineWidth = 0.6;
+            ctx.strokeStyle = `rgba(${lineColor}, ${alpha})`;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
 
-        // Draw particle node
         ctx.beginPath();
         ctx.arc(p1.x, p1.y, p1.baseRadius, 0, Math.PI * 2);
         ctx.fillStyle = p1.color;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = p1.color;
+        ctx.globalAlpha = isLight ? 0.4 : 0.7;
         ctx.fill();
-        ctx.shadowBlur = 0; // reset
+        ctx.globalAlpha = 1.0;
       }
 
       animId = requestAnimationFrame(render);
@@ -121,7 +116,7 @@ export default function ConstellationCanvas() {
       window.removeEventListener('mouseleave', onMouseLeave);
       cancelAnimationFrame(animId);
     };
-  }, []);
+  }, [theme]);
 
   return (
     <canvas
@@ -133,8 +128,9 @@ export default function ConstellationCanvas() {
         height: '100vh',
         pointerEvents: 'none',
         zIndex: 1,
-        opacity: 0.85
+        opacity: theme === 'light' ? 0.7 : 0.85
       }}
+      aria-hidden="true"
     />
   );
 }

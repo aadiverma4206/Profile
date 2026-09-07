@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { portfolioData } from '../../data/portfolioData';
-import { Briefcase, Calendar, MapPin, ArrowUpRight, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, CheckCircle2 } from 'lucide-react';
 import { soundFx } from '../../utils/audioEffects';
 
-export default function ExperienceSection() {
+export default function ExperienceSection({ theme = 'light' }) {
   const { experiences } = portfolioData;
   const [activeExpId, setActiveExpId] = useState(experiences[0]?.id);
 
   const activeExp = experiences.find((e) => e.id === activeExpId) || experiences[0];
+  const isLight = theme === 'light';
 
   return (
     <section
       id="experience"
       style={{
         position: 'relative',
-        padding: '100px 24px',
+        padding: '100px 20px',
         backgroundColor: 'transparent'
       }}
     >
@@ -27,61 +28,64 @@ export default function ExperienceSection() {
         }}
       >
         {/* Section Header */}
-        <div style={{ marginBottom: '48px' }}>
+        <div style={{ marginBottom: '44px' }}>
           <div
             style={{
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: '12px',
-              color: '#00d2ff',
+              color: 'var(--brand-blue)',
               fontWeight: 600,
               letterSpacing: '1px',
-              marginBottom: '10px'
+              marginBottom: '8px'
             }}
           >
-            02 // WORK & ROLES
+            02 // CAREER TIMELINE
           </div>
           <h2
             style={{
-              fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
-              color: '#ffffff',
+              fontSize: 'clamp(2.1rem, 3.8vw, 3rem)',
+              color: 'var(--text-primary)',
               fontWeight: 800,
-              letterSpacing: '-0.02em'
+              letterSpacing: '-0.025em'
             }}
           >
             Professional <span className="gradient-text-cyan">Experience</span>
           </h2>
         </div>
 
-        {/* Master-Detail Layout */}
+        {/* Master-Detail Responsive Grid */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-            gap: '32px',
+            gap: '28px',
             alignItems: 'start'
           }}
         >
-          {/* Experience List Navigation */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {experiences.map((exp, idx) => {
+          {/* Left Column: Role Selector Tabs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {experiences.map((exp) => {
               const isSelected = exp.id === activeExpId;
               return (
                 <div
                   key={exp.id}
                   onClick={() => {
-                    soundFx.playChirp(750 + idx * 50);
+                    soundFx.playChirp(680);
                     setActiveExpId(exp.id);
                   }}
                   className="modern-card"
                   style={{
-                    padding: '20px 24px',
+                    padding: '18px 20px',
                     borderRadius: '16px',
                     cursor: 'pointer',
-                    borderColor: isSelected ? 'rgba(0, 210, 255, 0.45)' : 'rgba(255, 255, 255, 0.08)',
+                    borderColor: isSelected ? 'var(--brand-blue)' : 'var(--border-subtle)',
                     background: isSelected
-                      ? 'linear-gradient(135deg, rgba(0, 210, 255, 0.12) 0%, rgba(13, 19, 36, 0.8) 100%)'
-                      : 'rgba(13, 19, 36, 0.5)',
-                    boxShadow: isSelected ? '0 20px 40px -10px rgba(0, 210, 255, 0.2)' : 'none'
+                      ? isLight
+                        ? 'rgba(37, 99, 235, 0.08)'
+                        : 'rgba(0, 210, 255, 0.12)'
+                      : 'var(--bg-surface)',
+                    boxShadow: isSelected ? 'var(--card-shadow-hover)' : 'none',
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   <div
@@ -89,133 +93,136 @@ export default function ExperienceSection() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      marginBottom: '6px'
+                      marginBottom: '4px'
                     }}
                   >
                     <span
                       style={{
-                        fontSize: '11px',
+                        fontSize: '10.5px',
                         fontFamily: 'JetBrains Mono, monospace',
-                        fontWeight: 600,
-                        color: isSelected ? '#00d2ff' : '#94a3b8'
+                        fontWeight: 700,
+                        color: isSelected ? 'var(--brand-blue)' : 'var(--text-muted)'
                       }}
                     >
-                      ROLE 0{idx + 1}
+                      {exp.tag}
                     </span>
                     <span
                       style={{
-                        fontSize: '11px',
-                        fontFamily: 'JetBrains Mono, monospace',
-                        color: '#94a3b8',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        padding: '2px 8px',
-                        borderRadius: '9999px'
+                        fontSize: '11.5px',
+                        color: 'var(--text-muted)'
                       }}
                     >
                       {exp.period}
                     </span>
                   </div>
 
-                  <h3
+                  <div
                     style={{
                       fontFamily: 'Syne, sans-serif',
                       fontSize: '16px',
                       fontWeight: 700,
-                      color: '#ffffff',
-                      marginBottom: '4px'
+                      color: isSelected ? 'var(--brand-blue)' : 'var(--text-primary)',
+                      marginBottom: '2px'
                     }}
                   >
                     {exp.role}
-                  </h3>
+                  </div>
 
                   <div
                     style={{
-                      fontSize: '13.5px',
-                      color: isSelected ? '#38bdf8' : '#94a3b8',
-                      fontWeight: 500
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
                     }}
                   >
-                    {exp.company}
+                    <span>{exp.company}</span>
+                    <span>•</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>{exp.location}</span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Active Experience Detailed Card */}
+          {/* Right Column: Active Role Detailed Dossier */}
           <div
             className="modern-card"
             style={{
-              padding: '36px',
-              borderRadius: '24px',
-              minHeight: '440px'
+              padding: 'clamp(24px, 3.5vw, 36px)',
+              borderRadius: '24px'
             }}
           >
-            {/* Header */}
+            {/* Role Header */}
             <div
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: '16px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                paddingBottom: '24px',
-                marginBottom: '28px'
+                alignItems: 'flex-start',
+                gap: '12px',
+                marginBottom: '18px',
+                paddingBottom: '16px',
+                borderBottom: '1px solid var(--border-subtle)'
               }}
             >
               <div>
                 <span
                   style={{
+                    display: 'inline-block',
+                    padding: '3px 10px',
+                    borderRadius: '9999px',
                     fontSize: '11px',
                     fontFamily: 'JetBrains Mono, monospace',
-                    fontWeight: 600,
-                    color: '#00d2ff',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px'
+                    fontWeight: 700,
+                    backgroundColor: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(0, 210, 255, 0.12)',
+                    color: 'var(--brand-blue)',
+                    marginBottom: '8px'
                   }}
                 >
                   {activeExp.tag}
                 </span>
+
                 <h3
                   style={{
                     fontFamily: 'Syne, sans-serif',
-                    fontSize: '1.6rem',
-                    color: '#ffffff',
+                    fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
                     fontWeight: 800,
-                    marginTop: '6px'
+                    color: 'var(--text-primary)',
+                    marginBottom: '6px'
                   }}
                 >
                   {activeExp.role}
                 </h3>
+
                 <div
                   style={{
-                    fontSize: '1.05rem',
+                    fontSize: '15px',
                     fontWeight: 600,
-                    color: '#38bdf8',
-                    marginTop: '2px'
+                    color: 'var(--brand-blue)',
+                    marginBottom: '8px'
                   }}
                 >
                   {activeExp.company}
                 </div>
-              </div>
 
-              <div
-                style={{
-                  fontSize: '13px',
-                  color: '#94a3b8',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px'
-                }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Calendar size={15} color="#00d2ff" />
-                  <span>{activeExp.period}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <MapPin size={15} color="#a855f7" />
-                  <span>{activeExp.location}</span>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    gap: '14px',
+                    fontSize: '12.5px',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <Calendar size={14} /> {activeExp.period}
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <MapPin size={14} /> {activeExp.location}
+                  </span>
                 </div>
               </div>
             </div>
@@ -223,55 +230,55 @@ export default function ExperienceSection() {
             {/* Description */}
             <p
               style={{
-                fontSize: '1.05rem',
-                lineHeight: 1.7,
-                color: '#e2e8f0',
-                marginBottom: '28px'
+                fontSize: '1.02rem',
+                lineHeight: 1.65,
+                color: 'var(--text-primary)',
+                marginBottom: '20px',
+                fontWeight: 500
               }}
             >
               {activeExp.description}
             </p>
 
-            {/* Highlights */}
-            <div style={{ marginBottom: '32px' }}>
+            {/* Bullet Highlights */}
+            <div style={{ marginBottom: '24px' }}>
               <div
                 style={{
-                  fontSize: '13px',
                   fontFamily: 'JetBrains Mono, monospace',
-                  fontWeight: 600,
-                  color: '#00d2ff',
-                  letterSpacing: '1px',
-                  marginBottom: '16px'
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.5px',
+                  marginBottom: '12px'
                 }}
               >
-                KEY IMPACT &amp; ARCHITECTURAL CONTRIBUTIONS
+                KEY CONTRIBUTIONS &amp; ARCHITECTURAL IMPACT
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {activeExp.highlights.map((point, pIdx) => (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {activeExp.highlights.map((item, idx) => (
                   <div
-                    key={pIdx}
+                    key={idx}
                     style={{
                       display: 'flex',
                       alignItems: 'flex-start',
-                      gap: '12px',
-                      fontSize: '0.98rem',
-                      lineHeight: 1.6,
-                      color: '#cbd5e1'
+                      gap: '10px'
                     }}
                   >
-                    <div
-                      style={{
-                        width: '6px',
-                        height: '6px',
-                        borderRadius: '50%',
-                        backgroundColor: '#00d2ff',
-                        boxShadow: '0 0 8px #00d2ff',
-                        marginTop: '9px',
-                        flexShrink: 0
-                      }}
+                    <CheckCircle2
+                      size={17}
+                      color="#10b981"
+                      style={{ flexShrink: 0, marginTop: '3px' }}
                     />
-                    <span>{point}</span>
+                    <span
+                      style={{
+                        fontSize: '0.94rem',
+                        lineHeight: 1.6,
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      {item}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -281,14 +288,15 @@ export default function ExperienceSection() {
             <div>
               <div
                 style={{
-                  fontSize: '12px',
                   fontFamily: 'JetBrains Mono, monospace',
-                  color: '#94a3b8',
-                  letterSpacing: '1px',
-                  marginBottom: '12px'
+                  fontSize: '11.5px',
+                  fontWeight: 700,
+                  color: 'var(--text-muted)',
+                  letterSpacing: '0.5px',
+                  marginBottom: '10px'
                 }}
               >
-                TECH APPLIED:
+                TECHNOLOGY MATRIX
               </div>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -296,13 +304,14 @@ export default function ExperienceSection() {
                   <span
                     key={t}
                     style={{
+                      padding: '5px 12px',
+                      borderRadius: '9999px',
                       fontSize: '12px',
                       fontFamily: 'JetBrains Mono, monospace',
-                      backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: '#e2e8f0',
-                      padding: '5px 12px',
-                      borderRadius: '9999px'
+                      fontWeight: 600,
+                      backgroundColor: isLight ? 'rgba(241, 245, 249, 0.85)' : 'rgba(30, 41, 59, 0.6)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-primary)'
                     }}
                   >
                     {t}

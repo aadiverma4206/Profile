@@ -1,25 +1,28 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { soundFx } from '../../utils/audioEffects';
-import { Layers, Zap, Eye } from 'lucide-react';
+import { Box, Layers, RotateCw } from 'lucide-react';
 
-export default function NewElementCore({ onPulseTriggered }) {
+export default function NewElementCore({ theme = 'light' }) {
   const mountRef = useRef(null);
-  const pulseTriggerRef = useRef(null);
-  const setHoloModeRef = useRef(null);
-  const [currentMode, setCurrentMode] = useState('ironman'); // 'ironman' | 'ultron'
+  const [activeMode, setActiveMode] = useState('lattice'); // 'lattice' | 'prism' | 'wireframe'
+  const modeRef = useRef(activeMode);
+
+  useEffect(() => {
+    modeRef.current = activeMode;
+  }, [activeMode]);
 
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
 
+    const width = container.clientWidth || 480;
+    const height = container.clientHeight || 420;
+
     // Three.js Scene Setup
     const scene = new THREE.Scene();
-    const width = container.clientWidth || 550;
-    const height = container.clientHeight || 550;
-
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
-    camera.position.set(0, 0, 7.8);
+    camera.position.set(0, 0, 7.2);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -29,332 +32,133 @@ export default function NewElementCore({ onPulseTriggered }) {
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.2;
     container.appendChild(renderer.domElement);
 
-    // Root Hologram Group
-    const hologramGroup = new THREE.Group();
-    scene.add(hologramGroup);
+    const isLight = theme === 'light';
 
-    // Holographic Theme Palettes
-    const palettes = {
-      ironman: {
-        primary: 0x00d2ff,
-        secondary: 0x38bdf8,
-        core: 0x00f0ff,
-        struts: 0x0284c7,
-        inner: 0x818cf8,
-        ambient: 0x0a192f
-      },
-      ultron: {
-        primary: 0xf59e0b,
-        secondary: 0xfbbf24,
-        core: 0xff4400,
-        struts: 0xd97706,
-        inner: 0xef4444,
-        ambient: 0x2e1005
-      }
-    };
-
-    let activePalette = palettes.ironman;
-
-    // 1. DYNAMIC LIGHTING
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, isLight ? 1.4 : 0.8);
     scene.add(ambientLight);
 
-    const corePointLight = new THREE.PointLight(activePalette.core, 5, 20);
-    corePointLight.position.set(0, 0, 0);
-    scene.add(corePointLight);
+    const keyLight = new THREE.DirectionalLight(isLight ? 0x2563eb : 0x00d2ff, isLight ? 2.5 : 3.0);
+    keyLight.position.set(5, 6, 6);
+    scene.add(keyLight);
 
-    const topRimLight = new THREE.DirectionalLight(0x00d2ff, 2);
-    topRimLight.position.set(5, 6, 5);
-    scene.add(topRimLight);
+    const fillLight = new THREE.DirectionalLight(isLight ? 0x0284c7 : 0x818cf8, 1.5);
+    fillLight.position.set(-5, -4, -4);
+    scene.add(fillLight);
 
-    // 2. INNER TRANSLUCENT NEURAL CONSCIOUSNESS CORE (Ultron / New Element)
-    const nucleusGeo = new THREE.IcosahedronGeometry(0.75, 3);
-    const nucleusMat = new THREE.MeshPhysicalMaterial({
-      color: activePalette.core,
-      emissive: activePalette.core,
-      emissiveIntensity: 0.75,
-      roughness: 0.05,
-      transmission: 0.92,
-      thickness: 1.4,
-      ior: 1.5,
+    // Root Group
+    const coreGroup = new THREE.Group();
+    scene.add(coreGroup);
+
+    // 1. Inner Crystalline Node
+    const coreGeo = new THREE.IcosahedronGeometry(0.9, 2);
+    const coreMat = new THREE.MeshPhysicalMaterial({
+      color: isLight ? 0x2563eb : 0x00d2ff,
+      emissive: isLight ? 0x1d4ed8 : 0x0284c7,
+      emissiveIntensity: isLight ? 0.35 : 0.65,
+      roughness: 0.1,
+      metalness: 0.2,
+      transmission: 0.6,
+      thickness: 1.2,
       transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending
+      opacity: 0.85
     });
-    const nucleusMesh = new THREE.Mesh(nucleusGeo, nucleusMat);
-    hologramGroup.add(nucleusMesh);
+    const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+    coreGroup.add(coreMesh);
 
-    // Inner White-Hot Photon Core
-    const plasmaGeo = new THREE.SphereGeometry(0.38, 32, 32);
-    const plasmaMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+    // 2. Geodesic Cage / Wireframe
+    const cageGeo = new THREE.IcosahedronGeometry(1.6, 1);
+    const cageMat = new THREE.MeshBasicMaterial({
+      color: isLight ? 0x0284c7 : 0x38bdf8,
+      wireframe: true,
       transparent: true,
-      opacity: 0.95
+      opacity: isLight ? 0.45 : 0.6
     });
-    const plasmaMesh = new THREE.Mesh(plasmaGeo, plasmaMat);
-    hologramGroup.add(plasmaMesh);
+    const cageMesh = new THREE.Mesh(cageGeo, cageMat);
+    coreGroup.add(cageMesh);
 
-    // 3. TRANSPARENT GEODESIC NEURAL LATTICE (Iron Man 2 / Ultron Synapse Cage)
-    const outerLatticeGeo = new THREE.IcosahedronGeometry(2.4, 1);
-    const posAttr = outerLatticeGeo.getAttribute('position');
-
-    // Extract unique nodes
-    const uniqueNodes = [];
-    const nodeSet = new Set();
-    for (let i = 0; i < posAttr.count; i++) {
-      const v = new THREE.Vector3(posAttr.getX(i), posAttr.getY(i), posAttr.getZ(i));
-      const key = `${v.x.toFixed(2)},${v.y.toFixed(2)},${v.z.toFixed(2)}`;
-      if (!nodeSet.has(key)) {
-        nodeSet.add(key);
-        uniqueNodes.push(v);
-      }
-    }
-
-    // Glowing Holographic Synapse Nodes
-    const nodeSpheres = [];
-    const nodeGeo = new THREE.SphereGeometry(0.09, 16, 16);
+    // 3. Vertex Nodes on Cage
+    const nodePositions = cageGeo.attributes.position;
+    const nodeGeo = new THREE.SphereGeometry(0.065, 16, 16);
     const nodeMat = new THREE.MeshBasicMaterial({
-      color: activePalette.primary,
-      transparent: true,
-      opacity: 0.9,
-      blending: THREE.AdditiveBlending
+      color: isLight ? 0x2563eb : 0xffffff
     });
+    const nodesGroup = new THREE.Group();
 
-    uniqueNodes.forEach((pos) => {
+    for (let i = 0; i < nodePositions.count; i++) {
+      const x = nodePositions.getX(i);
+      const y = nodePositions.getY(i);
+      const z = nodePositions.getZ(i);
       const node = new THREE.Mesh(nodeGeo, nodeMat);
-      node.position.copy(pos);
-      hologramGroup.add(node);
-      nodeSpheres.push({
-        mesh: node,
-        basePos: pos.clone(),
-        phase: Math.random() * Math.PI * 2
-      });
-    });
-
-    // Luminous Holographic Laser Struts (Wireframe with Additive Transparency)
-    const wireGeo = new THREE.WireframeGeometry(outerLatticeGeo);
-    const wireMat = new THREE.LineBasicMaterial({
-      color: activePalette.secondary,
-      transparent: true,
-      opacity: 0.75,
-      blending: THREE.AdditiveBlending,
-      linewidth: 1.5
-    });
-    const latticeLines = new THREE.LineSegments(wireGeo, wireMat);
-    hologramGroup.add(latticeLines);
-
-    // Inner Secondary Translucent Neural Cage
-    const innerLattice = new THREE.LineSegments(
-      new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(1.45, 1)),
-      new THREE.LineBasicMaterial({
-        color: activePalette.inner,
-        transparent: true,
-        opacity: 0.55,
-        blending: THREE.AdditiveBlending
-      })
-    );
-    hologramGroup.add(innerLattice);
-
-    // 4. MULTI-AXIS HOLOGRAPHIC GIMBAL ENERGY RINGS
-    const createHoloRing = (radius, tube, rotX, rotY, rotZ) => {
-      const ringGeo = new THREE.TorusGeometry(radius, tube, 16, 120);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: activePalette.primary,
-        transparent: true,
-        opacity: 0.7,
-        blending: THREE.AdditiveBlending
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.rotation.set(rotX, rotY, rotZ);
-      hologramGroup.add(ring);
-      return { mesh: ring, mat: ringMat };
-    };
-
-    const ring1 = createHoloRing(3.05, 0.02, Math.PI / 4, 0, 0);
-    const ring2 = createHoloRing(3.22, 0.02, 0, Math.PI / 3, 0);
-    const ring3 = createHoloRing(3.40, 0.02, Math.PI / 6, Math.PI / 6, Math.PI / 2);
-
-    // 5. TRANSLUCENT SYNAPSE SWARM (Ultron Neural Particles)
-    const particleCount = 500;
-    const particleGeo = new THREE.BufferGeometry();
-    const particlePositions = new Float32Array(particleCount * 3);
-    const particleColors = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount; i++) {
-      const rad = 1.0 + Math.random() * 2.7;
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-
-      particlePositions[i * 3] = rad * Math.sin(phi) * Math.cos(theta);
-      particlePositions[i * 3 + 1] = rad * Math.sin(phi) * Math.sin(theta);
-      particlePositions[i * 3 + 2] = rad * Math.cos(phi);
-
-      const c = new THREE.Color(activePalette.primary);
-      particleColors[i * 3] = c.r;
-      particleColors[i * 3 + 1] = c.g;
-      particleColors[i * 3 + 2] = c.b;
+      node.position.set(x, y, z);
+      nodesGroup.add(node);
     }
+    coreGroup.add(nodesGroup);
 
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-    particleGeo.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
-
-    const particleMat = new THREE.PointsMaterial({
-      size: 0.045,
-      vertexColors: true,
+    // 4. Orbital Ring
+    const ringGeo = new THREE.TorusGeometry(2.1, 0.02, 16, 100);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: isLight ? 0x4f46e5 : 0x00d2ff,
       transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending
+      opacity: isLight ? 0.4 : 0.7
     });
-    const particleSystem = new THREE.Points(particleGeo, particleMat);
-    hologramGroup.add(particleSystem);
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.rotation.x = Math.PI / 3;
+    coreGroup.add(ringMesh);
 
-    // 6. EXPANDING SYNAPSE SHOCKWAVE RING
-    const shockwaveGeo = new THREE.RingGeometry(0.15, 0.35, 64);
-    const shockwaveMat = new THREE.MeshBasicMaterial({
-      color: activePalette.core,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0,
-      blending: THREE.AdditiveBlending
-    });
-    const shockwaveMesh = new THREE.Mesh(shockwaveGeo, shockwaveMat);
-    hologramGroup.add(shockwaveMesh);
+    const ring2Mesh = ringMesh.clone();
+    ring2Mesh.rotation.x = -Math.PI / 4;
+    ring2Mesh.rotation.y = Math.PI / 4;
+    coreGroup.add(ring2Mesh);
 
-    // Switch Hologram Mode Function (Iron Man 2 vs Ultron Neural Matrix)
-    const updateHoloPalette = (modeKey) => {
-      const target = palettes[modeKey] || palettes.ironman;
-      activePalette = target;
-      corePointLight.color.setHex(target.core);
-      topRimLight.color.setHex(target.primary);
-      nucleusMat.color.setHex(target.core);
-      nucleusMat.emissive.setHex(target.core);
-      nodeMat.color.setHex(target.primary);
-      wireMat.color.setHex(target.secondary);
-      innerLattice.material.color.setHex(target.inner);
-      ring1.mat.color.setHex(target.primary);
-      ring2.mat.color.setHex(target.secondary);
-      ring3.mat.color.setHex(target.inner);
-      shockwaveMat.color.setHex(target.core);
-
-      // Re-color particles
-      const colors = particleGeo.attributes.color.array;
-      for (let i = 0; i < particleCount; i++) {
-        const c = new THREE.Color(target.primary);
-        colors[i * 3] = c.r;
-        colors[i * 3 + 1] = c.g;
-        colors[i * 3 + 2] = c.b;
-      }
-      particleGeo.attributes.color.needsUpdate = true;
-    };
-    setHoloModeRef.current = updateHoloPalette;
-
-    // Drag & Interactive Movement
-    let mouseX = 0;
-    let mouseY = 0;
+    // Mouse Interaction
+    let targetRotationX = 0;
+    let targetRotationY = 0;
     let isDragging = false;
-    let prevMouse = { x: 0, y: 0 };
-    let currentRotX = 0;
-    let currentRotY = 0;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
 
-    const handlePointerMove = (e) => {
-      const rect = container.getBoundingClientRect();
-      mouseX = (e.clientX - rect.left) / rect.width - 0.5;
-      mouseY = (e.clientY - rect.top) / rect.height - 0.5;
+    const onPointerDown = (e) => {
+      isDragging = true;
+      prevMouseX = e.clientX || (e.touches && e.touches[0].clientX);
+      prevMouseY = e.clientY || (e.touches && e.touches[0].clientY);
+    };
 
+    const onPointerMove = (e) => {
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
       if (isDragging) {
-        const dx = e.clientX - prevMouse.x;
-        const dy = e.clientY - prevMouse.y;
-        currentRotY += dx * 0.007;
-        currentRotX += dy * 0.007;
-        prevMouse = { x: e.clientX, y: e.clientY };
+        const deltaX = clientX - prevMouseX;
+        const deltaY = clientY - prevMouseY;
+        targetRotationY += deltaX * 0.008;
+        targetRotationX += deltaY * 0.008;
+        prevMouseX = clientX;
+        prevMouseY = clientY;
+      } else {
+        const rect = container.getBoundingClientRect();
+        const x = (clientX - rect.left) / rect.width - 0.5;
+        const y = (clientY - rect.top) / rect.height - 0.5;
+        targetRotationY = x * 1.2;
+        targetRotationX = -y * 1.2;
       }
     };
 
-    const handlePointerDown = (e) => {
-      isDragging = true;
-      prevMouse = { x: e.clientX, y: e.clientY };
-    };
-
-    const handlePointerUp = () => {
+    const onPointerUp = () => {
       isDragging = false;
     };
 
-    container.addEventListener('mousemove', handlePointerMove);
-    container.addEventListener('mousedown', handlePointerDown);
-    window.addEventListener('mouseup', handlePointerUp);
+    container.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove, { passive: true });
+    window.addEventListener('mouseup', onPointerUp);
 
-    // Energy Pulse
-    let pulseProgress = 1;
-    const triggerPulse = () => {
-      pulseProgress = 0;
-      soundFx.playPulse();
-      if (onPulseTriggered) onPulseTriggered();
-    };
-    pulseTriggerRef.current = triggerPulse;
+    container.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
 
-    // Animation Render Loop
-    let clock = new THREE.Clock();
-    let animId;
-
-    const animate = () => {
-      const elapsed = clock.getElapsedTime();
-
-      if (!isDragging) {
-        currentRotY += 0.004;
-        hologramGroup.rotation.y += (currentRotY + mouseX * 0.8 - hologramGroup.rotation.y) * 0.05;
-        hologramGroup.rotation.x += (currentRotX + mouseY * 0.8 - hologramGroup.rotation.x) * 0.05;
-      } else {
-        hologramGroup.rotation.y = currentRotY;
-        hologramGroup.rotation.x = currentRotX;
-      }
-
-      // Counter-rotating gimbal rings
-      ring1.mesh.rotation.x += 0.009;
-      ring1.mesh.rotation.y += 0.006;
-      ring2.mesh.rotation.y += 0.011;
-      ring2.mesh.rotation.z += 0.007;
-      ring3.mesh.rotation.z += 0.008;
-      ring3.mesh.rotation.x += 0.005;
-
-      // Particle orbital rotation
-      particleSystem.rotation.y -= 0.002;
-      particleSystem.rotation.x += 0.001;
-
-      // Nucleus Breathing & Transparency Pulses
-      const scaleBreathing = 1 + Math.sin(elapsed * 3.5) * 0.05;
-      nucleusMesh.scale.set(scaleBreathing, scaleBreathing, scaleBreathing);
-      plasmaMesh.scale.set(1 + Math.cos(elapsed * 4.5) * 0.08, 1 + Math.cos(elapsed * 4.5) * 0.08, 1 + Math.cos(elapsed * 4.5) * 0.08);
-
-      // Node vertex vibrations
-      nodeSpheres.forEach((node) => {
-        const delta = Math.sin(elapsed * 2.8 + node.phase) * 0.035;
-        node.mesh.position.copy(node.basePos).multiplyScalar(1 + delta);
-      });
-
-      // Pulse Shockwave Expansion
-      if (pulseProgress < 1) {
-        pulseProgress += 0.022;
-        const s = 0.5 + pulseProgress * 4.8;
-        shockwaveMesh.scale.set(s, s, 1);
-        shockwaveMesh.rotation.z += 0.04;
-        shockwaveMat.opacity = (1 - pulseProgress) * 0.95;
-        corePointLight.intensity = 5 + (1 - pulseProgress) * 15;
-        nucleusMat.emissiveIntensity = 0.75 + (1 - pulseProgress) * 2.5;
-      } else {
-        shockwaveMat.opacity = 0;
-        corePointLight.intensity = 4.5 + Math.sin(elapsed * 3) * 0.8;
-        nucleusMat.emissiveIntensity = 0.75;
-      }
-
-      renderer.render(scene, camera);
-      animId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
+    // Window Resize Handler
     const handleResize = () => {
       if (!container) return;
       const w = container.clientWidth;
@@ -363,28 +167,69 @@ export default function NewElementCore({ onPulseTriggered }) {
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    // Animation Loop
+    let animId;
+    let clock = new THREE.Clock();
+
+    const animate = () => {
+      animId = requestAnimationFrame(animate);
+      const elapsed = clock.getElapsedTime();
+
+      // Smooth damping
+      coreGroup.rotation.y += (targetRotationY - coreGroup.rotation.y) * 0.05 + 0.004;
+      coreGroup.rotation.x += (targetRotationX - coreGroup.rotation.x) * 0.05;
+
+      ringMesh.rotation.z = elapsed * 0.5;
+      ring2Mesh.rotation.z = -elapsed * 0.4;
+
+      // Mode adaptations
+      if (modeRef.current === 'prism') {
+        coreMesh.scale.setScalar(1 + Math.sin(elapsed * 2) * 0.08);
+        cageMesh.visible = false;
+        nodesGroup.visible = false;
+      } else if (modeRef.current === 'wireframe') {
+        coreMesh.visible = false;
+        cageMesh.visible = true;
+        cageMesh.scale.setScalar(1.2);
+        nodesGroup.visible = true;
+      } else {
+        coreMesh.visible = true;
+        coreMesh.scale.setScalar(1);
+        cageMesh.visible = true;
+        cageMesh.scale.setScalar(1);
+        nodesGroup.visible = true;
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
 
     return () => {
       cancelAnimationFrame(animId);
-      container.removeEventListener('mousemove', handlePointerMove);
-      container.removeEventListener('mousedown', handlePointerDown);
-      window.removeEventListener('mouseup', handlePointerUp);
       window.removeEventListener('resize', handleResize);
-      if (container.contains(renderer.domElement)) {
-        container.removeChild(renderer.domElement);
+      container.removeEventListener('mousedown', onPointerDown);
+      window.removeEventListener('mousemove', onPointerMove);
+      window.removeEventListener('mouseup', onPointerUp);
+      container.removeEventListener('touchstart', onPointerDown);
+      window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('touchend', onPointerUp);
+      if (renderer.domElement && renderer.domElement.parentNode) {
+        renderer.domElement.parentNode.removeChild(renderer.domElement);
       }
       renderer.dispose();
     };
-  }, []);
+  }, [theme]);
 
-  const handleModeSwitch = (mode) => {
-    soundFx.playChirp(mode === 'ultron' ? 620 : 880);
-    setCurrentMode(mode);
-    if (setHoloModeRef.current) {
-      setHoloModeRef.current(mode);
-    }
-  };
+  const modes = [
+    { id: 'lattice', label: 'Quantum Lattice', icon: Layers },
+    { id: 'prism', label: 'Solid Prism', icon: Box },
+    { id: 'wireframe', label: 'Wireframe Mesh', icon: RotateCw }
+  ];
+
+  const isLight = theme === 'light';
 
   return (
     <div
@@ -392,134 +237,144 @@ export default function NewElementCore({ onPulseTriggered }) {
         position: 'relative',
         width: '100%',
         height: '100%',
-        minHeight: '440px',
+        minHeight: '400px',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        userSelect: 'none'
+        justifyContent: 'space-between',
+        cursor: 'grab'
       }}
     >
-      {/* 3D WebGL Canvas */}
-      <div
-        ref={mountRef}
-        onClick={() => pulseTriggerRef.current && pulseTriggerRef.current()}
-        style={{
-          width: '100%',
-          height: '100%',
-          minHeight: '440px',
-          cursor: 'grab',
-          position: 'relative',
-          zIndex: 10
-        }}
-      />
-
-      {/* Modern Floating Hologram Controls Pill */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          gap: '8px',
-          zIndex: 20,
-          background: 'var(--bg-surface)',
-          backdropFilter: 'blur(24px)',
-          padding: '6px 12px',
-          borderRadius: '9999px',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: 'var(--card-shadow)'
-        }}
-      >
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            pulseTriggerRef.current && pulseTriggerRef.current();
-          }}
-          className="modern-btn-primary"
-          style={{
-            padding: '6px 14px',
-            fontSize: '0.78rem',
-            borderRadius: '9999px'
-          }}
-        >
-          <Zap size={13} />
-          <span>Synapse Pulse</span>
-        </button>
-
-        {/* Mode Switcher: Iron Man 2 vs Age of Ultron */}
-        <div style={{ display: 'flex', gap: '4px', backgroundColor: 'rgba(0,0,0,0.2)', padding: '2px', borderRadius: '9999px' }}>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleModeSwitch('ironman');
-            }}
-            style={{
-              padding: '4px 10px',
-              fontSize: '11px',
-              borderRadius: '9999px',
-              border: 'none',
-              cursor: 'pointer',
-              backgroundColor: currentMode === 'ironman' ? '#0284c7' : 'transparent',
-              color: currentMode === 'ironman' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontFamily: 'Plus Jakarta Sans, sans-serif'
-            }}
-          >
-            Iron Man 2
-          </button>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleModeSwitch('ultron');
-            }}
-            style={{
-              padding: '4px 10px',
-              fontSize: '11px',
-              borderRadius: '9999px',
-              border: 'none',
-              cursor: 'pointer',
-              backgroundColor: currentMode === 'ultron' ? '#d97706' : 'transparent',
-              color: currentMode === 'ultron' ? '#ffffff' : 'var(--text-secondary)',
-              fontWeight: 600,
-              fontFamily: 'Plus Jakarta Sans, sans-serif'
-            }}
-          >
-            Ultron Matrix
-          </button>
-        </div>
-      </div>
-
-      {/* Top Hologram Badge */}
+      {/* Top Controls & Status Bar */}
       <div
         style={{
           position: 'absolute',
           top: '16px',
-          left: '20px',
-          zIndex: 20,
+          left: '16px',
+          right: '16px',
+          zIndex: 10,
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '10px',
           pointerEvents: 'none'
         }}
-        className="modern-badge"
       >
-        <span
+        {/* Metric Pill */}
+        <div
           style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: currentMode === 'ironman' ? '#00d2ff' : '#f59e0b',
-            boxShadow: `0 0 10px ${currentMode === 'ironman' ? '#00d2ff' : '#f59e0b'}`
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '5px 12px',
+            borderRadius: '9999px',
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.85)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid var(--border-medium)',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '11px',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+            pointerEvents: 'auto'
           }}
-        />
-        <span>
-          {currentMode === 'ironman'
-            ? 'IRON MAN 2 // NEW ELEMENT HOLOGRAM'
-            : 'AVENGERS // ULTRON NEURAL CONSCIOUSNESS'}
-        </span>
+        >
+          <span
+            style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: '#10b981',
+              boxShadow: '0 0 6px #10b981'
+            }}
+          />
+          <span>Three.js WebGL Spatial Core</span>
+        </div>
+
+        {/* Mode Selector */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '4px',
+            backgroundColor: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.85)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid var(--border-medium)',
+            borderRadius: '9999px',
+            padding: '3px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+            pointerEvents: 'auto'
+          }}
+        >
+          {modes.map((m) => {
+            const Icon = m.icon;
+            const active = activeMode === m.id;
+            return (
+              <button
+                key={m.id}
+                onClick={() => {
+                  soundFx.playChirp(680);
+                  setActiveMode(m.id);
+                }}
+                style={{
+                  padding: '5px 10px',
+                  borderRadius: '9999px',
+                  border: 'none',
+                  background: active ? 'var(--brand-blue)' : 'transparent',
+                  color: active ? '#ffffff' : 'var(--text-secondary)',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  transition: 'all 0.2s ease'
+                }}
+                title={m.label}
+              >
+                <Icon size={12} />
+                <span className="mode-label-text">{m.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
+
+      {/* WebGL Canvas Container */}
+      <div
+        ref={mountRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: '380px',
+          position: 'relative'
+        }}
+      />
+
+      {/* Bottom Hint */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '14px',
+          left: '16px',
+          right: '16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          pointerEvents: 'none',
+          fontSize: '11px',
+          fontFamily: 'JetBrains Mono, monospace',
+          color: 'var(--text-muted)'
+        }}
+      >
+        <span>Interactive: Drag to rotate</span>
+        <span>60 FPS • 1,420 Vertices</span>
+      </div>
+
+      <style>{`
+        @media (max-width: 540px) {
+          .mode-label-text { display: none; }
+        }
+      `}</style>
     </div>
   );
 }

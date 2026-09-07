@@ -2,55 +2,78 @@ import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Download, Menu, X, Sun, Moon } from 'lucide-react';
 import { soundFx } from '../../utils/audioEffects';
 
-export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onToggleTheme }) {
+export default function Navbar({ onSoundToggle, soundActive, theme = 'light', onToggleTheme }) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener('scroll', onScroll);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 20);
+
+      // Simple active section detection
+      const sections = ['hero', 'about', 'experience', 'projects', 'skills', 'contact'];
+      for (const s of sections) {
+        const el = document.getElementById(s);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= 200 && rect.bottom >= 200) {
+            setActiveSection(s);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const navItems = [
-    { label: 'Overview', href: '#hero' },
-    { label: 'About', href: '#about' },
-    { label: 'Experience', href: '#experience' },
-    { label: 'Projects', href: '#projects' },
-    { label: 'Skills', href: '#skills' },
-    { label: 'Contact', href: '#contact' }
+    { label: 'Overview', href: '#hero', id: 'hero' },
+    { label: 'About', href: '#about', id: 'about' },
+    { label: 'Experience', href: '#experience', id: 'experience' },
+    { label: 'Projects', href: '#projects', id: 'projects' },
+    { label: 'Skills', href: '#skills', id: 'skills' },
+    { label: 'Contact', href: '#contact', id: 'contact' }
   ];
 
-  const handleNavClick = (idx) => {
-    soundFx.playChirp(700 + idx * 40);
+  const handleNavClick = () => {
+    soundFx.playChirp(650);
     setMobileMenuOpen(false);
   };
+
+  const isLight = theme === 'light';
 
   return (
     <header
       style={{
         position: 'fixed',
-        top: '18px',
+        top: '16px',
         left: 0,
         right: 0,
         zIndex: 1000,
         display: 'flex',
         justifyContent: 'center',
-        padding: '0 20px',
+        padding: '0 16px',
         pointerEvents: 'none'
       }}
     >
       <div
         style={{
           width: '100%',
-          maxWidth: '1140px',
-          background: 'var(--bg-surface)',
-          backdropFilter: 'blur(28px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-          border: '1px solid var(--border-subtle)',
+          maxWidth: '1120px',
+          background: scrolled
+            ? 'var(--bg-surface)'
+            : isLight
+            ? 'rgba(255, 255, 255, 0.85)'
+            : 'rgba(15, 23, 42, 0.8)',
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          border: '1px solid var(--border-medium)',
           borderRadius: '9999px',
-          padding: '8px 18px',
-          boxShadow: 'var(--card-shadow)',
+          padding: '8px 16px',
+          boxShadow: scrolled ? 'var(--card-shadow)' : '0 4px 20px rgba(0, 0, 0, 0.05)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -61,7 +84,7 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
         {/* Brand / Logo */}
         <a
           href="#hero"
-          onClick={() => soundFx.playChirp(900)}
+          onClick={() => soundFx.playChirp(700)}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -70,37 +93,32 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
             color: 'var(--text-primary)'
           }}
         >
-          {/* Arc Pulse Badge */}
+          {/* Stylized Node Avatar */}
           <div
             style={{
               width: '32px',
               height: '32px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, #00d2ff 0%, #2563eb 100%)',
+              background: 'linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-cyan) 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 15px rgba(0, 210, 255, 0.6)'
+              boxShadow: '0 2px 10px rgba(37, 99, 235, 0.35)',
+              color: '#ffffff',
+              fontWeight: 800,
+              fontSize: '13px',
+              fontFamily: 'Syne, sans-serif'
             }}
           >
-            <div
-              style={{
-                width: '10px',
-                height: '10px',
-                borderRadius: '50%',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 0 8px #ffffff'
-              }}
-            />
+            AK
           </div>
 
           <div>
             <div
               style={{
                 fontFamily: 'Syne, sans-serif',
-                fontSize: '14px',
+                fontSize: '14.5px',
                 fontWeight: 700,
-                letterSpacing: '-0.01em',
                 color: 'var(--text-primary)',
                 display: 'flex',
                 alignItems: 'center',
@@ -110,17 +128,17 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
               Aditya Kumar
               <span
                 style={{
-                  fontSize: '9px',
+                  fontSize: '9.5px',
                   fontFamily: 'JetBrains Mono, monospace',
-                  padding: '1px 6px',
-                  backgroundColor: 'rgba(0, 210, 255, 0.15)',
-                  border: '1px solid rgba(0, 210, 255, 0.3)',
-                  color: 'var(--brand-cyan)',
+                  padding: '2px 7px',
+                  backgroundColor: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(0, 210, 255, 0.12)',
+                  border: `1px solid ${isLight ? 'rgba(37, 99, 235, 0.2)' : 'rgba(0, 210, 255, 0.3)'}`,
+                  color: isLight ? 'var(--brand-blue)' : 'var(--brand-cyan)',
                   borderRadius: '9999px',
                   fontWeight: 600
                 }}
               >
-                PROT-01
+                ARCHITECT
               </span>
             </div>
           </div>
@@ -131,34 +149,39 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
           style={{
             display: 'none',
             alignItems: 'center',
-            gap: '6px',
-            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+            gap: '4px',
+            backgroundColor: isLight ? 'rgba(241, 245, 249, 0.7)' : 'rgba(30, 41, 59, 0.5)',
             border: '1px solid var(--border-subtle)',
-            padding: '4px 8px',
+            padding: '3px 6px',
             borderRadius: '9999px'
           }}
           className="desktop-nav"
         >
-          {navItems.map((item, idx) => (
-            <a
-              key={item.label}
-              href={item.href}
-              onClick={() => handleNavClick(idx)}
-              style={{
-                textDecoration: 'none',
-                fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontSize: '13px',
-                fontWeight: 500,
-                color: 'var(--text-secondary)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                transition: 'all 0.2s ease'
-              }}
-              className="modern-nav-link"
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const isActive = activeSection === item.id;
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={handleNavClick}
+                style={{
+                  textDecoration: 'none',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif',
+                  fontSize: '13px',
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? 'var(--brand-blue)' : 'var(--text-secondary)',
+                  backgroundColor: isActive ? 'var(--bg-surface-elevated)' : 'transparent',
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.06)' : 'none',
+                  transition: 'all 0.2s ease'
+                }}
+                className="nav-link-pill"
+              >
+                {item.label}
+              </a>
+            );
+          })}
         </nav>
 
         {/* Right Actions */}
@@ -167,8 +190,8 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
           <button
             onClick={onToggleTheme}
             style={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
+              background: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-medium)',
               borderRadius: '9999px',
               padding: '7px 11px',
               color: 'var(--text-primary)',
@@ -177,35 +200,49 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
               alignItems: 'center',
               gap: '6px',
               fontSize: '12px',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               transition: 'all 0.2s ease'
             }}
             title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
             aria-label="Toggle Theme"
           >
-            {theme === 'dark' ? <Sun size={15} color="#f59e0b" /> : <Moon size={15} color="#4f46e5" />}
+            {theme === 'dark' ? (
+              <Sun size={15} color="#f59e0b" />
+            ) : (
+              <Moon size={15} color="#2563eb" />
+            )}
           </button>
 
-          {/* Audio Toggle */}
+          {/* Audio Toggle (Optional feedback) */}
           <button
             onClick={() => {
               const active = soundFx.toggle();
               if (onSoundToggle) onSoundToggle(active);
             }}
             style={{
-              background: soundActive ? 'rgba(0, 210, 255, 0.15)' : 'var(--bg-surface)',
-              border: `1px solid ${soundActive ? 'rgba(0, 210, 255, 0.5)' : 'var(--border-subtle)'}`,
+              background: soundActive
+                ? isLight
+                  ? 'rgba(37, 99, 235, 0.1)'
+                  : 'rgba(0, 210, 255, 0.15)'
+                : 'var(--bg-surface-elevated)',
+              border: `1px solid ${
+                soundActive
+                  ? isLight
+                    ? 'rgba(37, 99, 235, 0.4)'
+                    : 'rgba(0, 210, 255, 0.4)'
+                  : 'var(--border-medium)'
+              }`,
               borderRadius: '9999px',
               padding: '7px 11px',
-              color: soundActive ? 'var(--brand-cyan)' : 'var(--text-secondary)',
+              color: soundActive ? 'var(--brand-blue)' : 'var(--text-muted)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
               fontSize: '12px',
-              fontFamily: 'JetBrains Mono, monospace',
               transition: 'all 0.2s ease'
             }}
-            title="Toggle Sound FX"
+            title={soundActive ? 'Sound Feedback: ON' : 'Sound Feedback: OFF'}
+            aria-label="Toggle Sound Feedback"
           >
             {soundActive ? <Volume2 size={14} /> : <VolumeX size={14} />}
           </button>
@@ -214,36 +251,37 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
           <a
             href="/assets/Aditya_Kumar_Resume.pdf"
             download="Aditya_Kumar_Resume.pdf"
-            onClick={() => soundFx.playLaser()}
+            onClick={() => soundFx.playChirp(700)}
             className="modern-btn-primary"
             style={{
-              padding: '7px 16px',
-              fontSize: '12.5px'
+              padding: '7px 15px',
+              fontSize: '12px',
+              gap: '6px'
             }}
           >
             <Download size={13} />
-            <span>Resume</span>
+            <span className="resume-btn-text">Resume</span>
           </a>
 
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => {
-              soundFx.playChirp(800);
+              soundFx.playChirp(650);
               setMobileMenuOpen(!mobileMenuOpen);
             }}
             style={{
               display: 'flex',
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border-subtle)',
+              background: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-medium)',
               borderRadius: '9999px',
-              padding: '7px 10px',
+              padding: '7px 9px',
               color: 'var(--text-primary)',
               cursor: 'pointer'
             }}
             className="mobile-menu-btn"
-            aria-label="Toggle menu"
+            aria-label="Toggle mobile menu"
           >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            {mobileMenuOpen ? <X size={17} /> : <Menu size={17} />}
           </button>
         </div>
       </div>
@@ -253,43 +291,46 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
         <div
           style={{
             position: 'absolute',
-            top: '70px',
-            left: '20px',
-            right: '20px',
+            top: '64px',
+            left: '16px',
+            right: '16px',
             background: 'var(--bg-surface)',
-            backdropFilter: 'blur(30px)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: '24px',
-            padding: '24px',
+            backdropFilter: 'blur(28px)',
+            WebkitBackdropFilter: 'blur(28px)',
+            border: '1px solid var(--border-medium)',
+            borderRadius: '20px',
+            padding: '20px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '14px',
+            gap: '10px',
             boxShadow: 'var(--card-shadow)',
-            pointerEvents: 'auto',
-            animation: 'fadeIn 0.25s ease-out'
+            pointerEvents: 'auto'
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
-            {navItems.map((item, idx) => (
-              <a
-                key={item.label}
-                href={item.href}
-                onClick={() => handleNavClick(idx)}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '12px',
-                  background: 'rgba(0, 0, 0, 0.04)',
-                  border: '1px solid var(--border-subtle)',
-                  color: 'var(--text-primary)',
-                  textDecoration: 'none',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  fontFamily: 'Plus Jakarta Sans, sans-serif'
-                }}
-              >
-                {item.label}
-              </a>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+            {navItems.map((item) => {
+              const isActive = activeSection === item.id;
+              return (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={handleNavClick}
+                  style={{
+                    padding: '10px 14px',
+                    borderRadius: '12px',
+                    background: isActive ? 'var(--bg-surface-subtle)' : 'transparent',
+                    border: `1px solid ${isActive ? 'var(--border-highlight)' : 'var(--border-subtle)'}`,
+                    color: isActive ? 'var(--brand-blue)' : 'var(--text-primary)',
+                    textDecoration: 'none',
+                    fontSize: '13.5px',
+                    fontWeight: 600,
+                    textAlign: 'center'
+                  }}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </div>
         </div>
       )}
@@ -299,9 +340,11 @@ export default function Navbar({ onSoundToggle, soundActive, theme = 'dark', onT
           .desktop-nav { display: flex !important; }
           .mobile-menu-btn { display: none !important; }
         }
-        .modern-nav-link:hover {
-          color: var(--brand-cyan) !important;
-          background: rgba(0, 210, 255, 0.08);
+        @media (max-width: 480px) {
+          .resume-btn-text { display: none; }
+        }
+        .nav-link-pill:hover {
+          color: var(--brand-blue) !important;
         }
       `}</style>
     </header>

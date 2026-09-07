@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { portfolioData } from '../../data/portfolioData';
-import { Layers, Cpu, Database, Terminal, Check } from 'lucide-react';
+import { Layers, Cpu, Database, Terminal } from 'lucide-react';
 import { soundFx } from '../../utils/audioEffects';
 
-export default function SkillsSection() {
+export default function SkillsSection({ theme = 'light' }) {
   const { skills } = portfolioData;
   const [hoveredSkill, setHoveredSkill] = useState(null);
+  const isLight = theme === 'light';
 
   const getCategoryIcon = (name) => {
     switch (name) {
-      case 'Frontend & 3D Matrix':
-        return <Layers size={20} color="#00d2ff" />;
-      case 'Backend & Systems Engine':
-        return <Cpu size={20} color="#3b82f6" />;
-      case 'Databases & Data Storage':
-        return <Database size={20} color="#f59e0b" />;
+      case 'Frontend & 3D WebGL':
+        return <Layers size={18} color="var(--brand-blue)" />;
+      case 'Backend & Systems':
+        return <Cpu size={18} color="var(--brand-cyan)" />;
+      case 'Databases & Storage':
+        return <Database size={18} color="#d97706" />;
       default:
-        return <Terminal size={20} color="#10b981" />;
+        return <Terminal size={18} color="#059669" />;
     }
   };
 
@@ -25,7 +26,7 @@ export default function SkillsSection() {
       id="skills"
       style={{
         position: 'relative',
-        padding: '100px 24px',
+        padding: '100px 20px',
         backgroundColor: 'transparent'
       }}
     >
@@ -38,36 +39,36 @@ export default function SkillsSection() {
         }}
       >
         {/* Section Header */}
-        <div style={{ marginBottom: '48px' }}>
+        <div style={{ marginBottom: '44px' }}>
           <div
             style={{
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: '12px',
-              color: '#00d2ff',
+              color: 'var(--brand-blue)',
               fontWeight: 600,
               letterSpacing: '1px',
-              marginBottom: '10px'
+              marginBottom: '8px'
             }}
           >
-            04 // EXPERTISE & TOOLS
+            04 // CAPABILITIES & ARCHITECTURE
           </div>
           <h2
             style={{
-              fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
-              color: '#ffffff',
+              fontSize: 'clamp(2.1rem, 3.8vw, 3rem)',
+              color: 'var(--text-primary)',
               fontWeight: 800,
-              letterSpacing: '-0.02em'
+              letterSpacing: '-0.025em'
             }}
           >
             Technical <span className="gradient-text-cyan">Arsenal</span>
           </h2>
         </div>
 
-        {/* 4-Column Modern Card Grid */}
+        {/* 4-Column Responsive Card Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 270px), 1fr))',
             gap: '24px'
           }}
         >
@@ -77,7 +78,7 @@ export default function SkillsSection() {
               className="modern-card"
               style={{
                 borderRadius: '24px',
-                padding: '28px'
+                padding: '24px'
               }}
             >
               {/* Category Header */}
@@ -85,19 +86,18 @@ export default function SkillsSection() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px',
-                  marginBottom: '22px',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                  paddingBottom: '16px'
+                  gap: '10px',
+                  marginBottom: '20px',
+                  paddingBottom: '14px',
+                  borderBottom: '1px solid var(--border-subtle)'
                 }}
               >
                 <div
                   style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '10px',
+                    backgroundColor: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(0, 210, 255, 0.12)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -106,78 +106,77 @@ export default function SkillsSection() {
                   {getCategoryIcon(group.category)}
                 </div>
 
-                <h3
+                <div
                   style={{
                     fontFamily: 'Syne, sans-serif',
-                    fontSize: '15px',
-                    color: '#ffffff',
-                    fontWeight: 700
+                    fontSize: '15.5px',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)'
                   }}
                 >
                   {group.category}
-                </h3>
+                </div>
               </div>
 
-              {/* Skill Bars */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {group.items.map((sk) => {
-                  const isHovered = hoveredSkill === sk.name;
+              {/* Skills List with Progress Bars */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                {group.items.map((skill) => {
+                  const isHovered = hoveredSkill === skill.name;
                   return (
                     <div
-                      key={sk.name}
+                      key={skill.name}
                       onMouseEnter={() => {
                         soundFx.playHover();
-                        setHoveredSkill(sk.name);
+                        setHoveredSkill(skill.name);
                       }}
                       onMouseLeave={() => setHoveredSkill(null)}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'default' }}
                     >
                       <div
                         style={{
                           display: 'flex',
-                          alignItems: 'center',
                           justifyContent: 'space-between',
+                          alignItems: 'center',
                           marginBottom: '6px'
                         }}
                       >
                         <span
                           style={{
-                            fontSize: '13.5px',
-                            fontWeight: 500,
-                            color: isHovered ? '#00d2ff' : '#cbd5e1',
+                            fontSize: '13px',
+                            fontWeight: 600,
+                            color: isHovered ? 'var(--brand-blue)' : 'var(--text-primary)',
                             transition: 'color 0.2s ease'
                           }}
                         >
-                          {sk.name}
+                          {skill.name}
                         </span>
                         <span
                           style={{
-                            fontFamily: 'JetBrains Mono, monospace',
                             fontSize: '11px',
-                            color: isHovered ? '#ffffff' : '#94a3b8'
+                            fontFamily: 'JetBrains Mono, monospace',
+                            color: 'var(--text-muted)',
+                            fontWeight: 600
                           }}
                         >
-                          {sk.level}%
+                          {skill.level}%
                         </span>
                       </div>
 
-                      {/* Clean Modern Progress Bar */}
+                      {/* Progress Track */}
                       <div
                         style={{
-                          width: '100%',
-                          height: '5px',
-                          backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                          height: '6px',
                           borderRadius: '9999px',
+                          backgroundColor: isLight ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.08)',
                           overflow: 'hidden'
                         }}
                       >
                         <div
                           style={{
-                            width: `${sk.level}%`,
+                            width: `${skill.level}%`,
                             height: '100%',
-                            background: `linear-gradient(90deg, ${group.color} 0%, #ffffff 100%)`,
                             borderRadius: '9999px',
-                            boxShadow: `0 0 10px ${group.color}`,
+                            background: `linear-gradient(90deg, ${group.color} 0%, var(--brand-cyan) 100%)`,
                             transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
                           }}
                         />

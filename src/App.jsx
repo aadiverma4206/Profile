@@ -13,26 +13,26 @@ import Footer from './components/hud/Footer';
 import { soundFx } from './utils/audioEffects';
 
 export default function App() {
+  // 1. DEFAULT TO LIGHT MODE with localStorage persistence
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('zold_theme') || 'dark';
+    return localStorage.getItem('portfolio_theme') || 'light';
   });
   const [soundActive, setSoundActive] = useState(false);
-  const [pulseCount, setPulseCount] = useState(0);
-  const [useEditedPhoto, setUseEditedPhoto] = useState(true);
-  const [backdropIntensity, setBackdropIntensity] = useState('vivid');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('zold_theme', theme);
+    localStorage.setItem('portfolio_theme', theme);
+
+    // Update meta theme-color to match theme
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', theme === 'light' ? '#f8fafc' : '#090d16');
+    }
   }, [theme]);
 
   const toggleTheme = () => {
-    soundFx.playChirp(theme === 'dark' ? 880 : 540);
+    soundFx.playChirp(theme === 'dark' ? 680 : 540);
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
-
-  const handlePulseTrigger = () => {
-    setPulseCount((c) => c + 1);
   };
 
   return (
@@ -43,23 +43,19 @@ export default function App() {
         minHeight: '100vh',
         color: 'var(--text-primary)',
         overflowX: 'hidden',
-        transition: 'background-color 0.3s ease, color 0.3s ease'
+        transition: 'background-color 0.35s ease, color 0.35s ease'
       }}
     >
-      {/* 1. Full-Screen Prominent Background Image Layer */}
-      <BackgroundHologram
-        useEditedPhoto={useEditedPhoto}
-        intensity={backdropIntensity}
-        theme={theme}
-      />
+      {/* 1. Ambient Dynamic Gradient Mesh Background */}
+      <BackgroundHologram theme={theme} />
 
-      {/* 2. Interactive Holographic Custom Cursor with Dynamic Trail */}
+      {/* 2. Sleek Custom Magnetic Pointer Dot */}
       <JarvisCursor />
 
-      {/* 3. Interactive Background Particle Constellation Mesh */}
+      {/* 3. Interactive WebGL/Canvas Constellation Particles */}
       <ConstellationCanvas theme={theme} />
 
-      {/* 4. Top Floating Glass Island Navbar */}
+      {/* 4. Top Floating Island Glass Navbar */}
       <Navbar
         theme={theme}
         onToggleTheme={toggleTheme}
@@ -69,15 +65,7 @@ export default function App() {
 
       {/* 5. Main Portfolio Modules */}
       <main style={{ position: 'relative', zIndex: 10 }}>
-        <HeroSection
-          theme={theme}
-          onToggleTheme={toggleTheme}
-          onPulseTriggered={handlePulseTrigger}
-          useEditedPhoto={useEditedPhoto}
-          onTogglePhoto={() => setUseEditedPhoto((p) => !p)}
-          backdropIntensity={backdropIntensity}
-          onChangeIntensity={(i) => setBackdropIntensity(i)}
-        />
+        <HeroSection theme={theme} />
         <AboutSection theme={theme} />
         <ExperienceSection theme={theme} />
         <ProjectsSection theme={theme} />
@@ -85,7 +73,7 @@ export default function App() {
         <ContactSection theme={theme} />
       </main>
 
-      {/* 6. Modern Footer */}
+      {/* 6. Refined Footer */}
       <Footer theme={theme} />
     </div>
   );

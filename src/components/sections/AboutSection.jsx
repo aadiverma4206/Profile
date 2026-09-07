@@ -1,17 +1,40 @@
 import React from 'react';
 import { portfolioData } from '../../data/portfolioData';
-import { Award, GraduationCap, Cpu, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { soundFx } from '../../utils/audioEffects';
+import { Award, GraduationCap, Cpu, CheckCircle2, ShieldCheck, Code2, Globe2 } from 'lucide-react';
 
-export default function AboutSection() {
-  const { personal, education, certifications } = portfolioData;
+export default function AboutSection({ theme = 'light' }) {
+  const { education, certifications } = portfolioData;
+  const isLight = theme === 'light';
+
+  const pillars = [
+    {
+      icon: Code2,
+      title: "Interactive 3D & WebGL",
+      desc: "Crafting real-time WebGL engines, spatial product visualizers, and performant Three.js scenes with sub-16ms frame budgets."
+    },
+    {
+      icon: Cpu,
+      title: "Scalable Full Stack Architecture",
+      desc: "Architecting decoupled microservices and event-driven backends with Node.js, Express, TypeScript, and high-concurrency SQL/NoSQL stores."
+    },
+    {
+      icon: Globe2,
+      title: "Cross-Platform Mobile Ecosystems",
+      desc: "Building production Flutter applications with secure biometrics, offline caching, live WebSockets, and integrated payment gateways."
+    },
+    {
+      icon: ShieldCheck,
+      title: "Security & Enterprise Auditing",
+      desc: "Implementing military-grade RBAC permissions, tamper-evident audit logs, JWT handshakes, and government-standard data protection."
+    }
+  ];
 
   return (
     <section
       id="about"
       style={{
         position: 'relative',
-        padding: '100px 24px',
+        padding: '100px 20px',
         backgroundColor: 'transparent'
       }}
     >
@@ -24,126 +47,140 @@ export default function AboutSection() {
         }}
       >
         {/* Section Header */}
-        <div style={{ marginBottom: '48px' }}>
+        <div style={{ marginBottom: '44px' }}>
           <div
             style={{
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: '12px',
-              color: '#00d2ff',
+              color: 'var(--brand-blue)',
               fontWeight: 600,
               letterSpacing: '1px',
-              marginBottom: '10px'
+              marginBottom: '8px'
             }}
           >
-            01 // BACKGROUND & IDENTITY
+            01 // BACKGROUND & PHILOSOPHY
           </div>
           <h2
             style={{
-              fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
-              color: '#ffffff',
+              fontSize: 'clamp(2.1rem, 3.8vw, 3rem)',
+              color: 'var(--text-primary)',
               fontWeight: 800,
-              letterSpacing: '-0.02em'
+              letterSpacing: '-0.025em'
             }}
           >
             Full Stack <span className="gradient-text-cyan">Craftsmanship</span>
           </h2>
         </div>
 
-        {/* 2-Column Modern Grid */}
+        {/* 2-Column Responsive Layout */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
-            gap: '32px'
+            gap: '28px'
           }}
         >
-          {/* Left Column: Bio Card */}
+          {/* Left Column: Bio & Core Engineering Pillars */}
           <div
             className="modern-card"
             style={{
-              padding: '36px',
-              borderRadius: '24px'
+              padding: 'clamp(22px, 3.5vw, 36px)',
+              borderRadius: '24px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '24px'
             }}
           >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                marginBottom: '24px',
-                color: '#ffffff',
-                fontFamily: 'Syne, sans-serif',
-                fontSize: '18px',
-                fontWeight: 700
-              }}
-            >
-              <Cpu size={22} color="#00d2ff" />
-              <span>Architectural Philosophy</span>
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  marginBottom: '16px',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'Syne, sans-serif',
+                  fontSize: '18px',
+                  fontWeight: 700
+                }}
+              >
+                <Cpu size={20} color="var(--brand-blue)" />
+                <span>Engineering Mindset</span>
+              </div>
+
+              <p
+                style={{
+                  fontSize: '1rem',
+                  lineHeight: 1.7,
+                  color: 'var(--text-primary)',
+                  marginBottom: '16px',
+                  fontWeight: 500
+                }}
+              >
+                I build digital systems at the convergence of <strong style={{ color: 'var(--brand-blue)' }}>interactive 3D graphics</strong> and resilient enterprise backend architecture. With hands-on experience in both government state centers and high-velocity private engineering firms, I specialize in high-throughput, latency-critical software.
+              </p>
+
+              <p
+                style={{
+                  fontSize: '0.94rem',
+                  lineHeight: 1.65,
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                Whether it's building a 3D tactical stadium visualizer in Three.js &amp; React 19, an end-to-end digital gold trading app in Flutter, or a nationwide pharmaceutical supply chain verifier for the National Informatics Centre (NIC), I write clean, maintainable, and type-safe code.
+              </p>
             </div>
 
-            <p
-              style={{
-                fontSize: '1.02rem',
-                lineHeight: 1.7,
-                color: '#e2e8f0',
-                marginBottom: '20px'
-              }}
-            >
-              I build web and mobile systems at the intersection of <strong style={{ color: '#00d2ff' }}>photorealistic 3D interaction</strong> and bulletproof enterprise backend design. With hands-on experience across both government state centres and fast-moving private software companies, I focus on delivering scalable, latency-optimized solutions.
-            </p>
-
-            <p
-              style={{
-                fontSize: '0.96rem',
-                lineHeight: 1.7,
-                color: '#94a3b8',
-                marginBottom: '32px'
-              }}
-            >
-              From engineering real-time pharmaceutical drug tracking infrastructure for the National Informatics Centre (NIC) to developing interactive 3D tactical football simulators and live bullion trading platforms at Botivate Services LLP, quality and user delight remain paramount.
-            </p>
-
-            {/* Competency Pills */}
+            {/* 4 Pillars Grid */}
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '12px'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                gap: '14px'
               }}
             >
-              {[
-                'React 19 & Three.js (WebGL)',
-                'Production Flutter Ecosystems',
-                'Enterprise REST APIs & JWT/RBAC',
-                'Real-Time WebSockets & Socket.IO',
-                'SQL & Scalable Cloud DBs',
-                'AI-Assisted Fast Prototyping'
-              ].map((item) => (
-                <div
-                  key={item}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    fontSize: '13.5px',
-                    fontWeight: 500,
-                    color: '#cbd5e1'
-                  }}
-                >
-                  <CheckCircle2 size={16} color="#00d2ff" />
-                  <span>{item}</span>
-                </div>
-              ))}
+              {pillars.map((p) => {
+                const Icon = p.icon;
+                return (
+                  <div
+                    key={p.title}
+                    style={{
+                      padding: '16px',
+                      borderRadius: '16px',
+                      background: isLight ? 'rgba(241, 245, 249, 0.7)' : 'rgba(30, 41, 59, 0.45)',
+                      border: '1px solid var(--border-subtle)',
+                      transition: 'transform 0.2s ease'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <Icon size={16} color="var(--brand-blue)" />
+                      <div
+                        style={{
+                          fontFamily: 'Syne, sans-serif',
+                          fontSize: '13.5px',
+                          fontWeight: 700,
+                          color: 'var(--text-primary)'
+                        }}
+                      >
+                        {p.title}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                      {p.desc}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Right Column: Education & Accreditations */}
+          {/* Right Column: Education & Verified Certifications */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            {/* Education Card */}
+            {/* Academic Credentials */}
             <div
               className="modern-card"
               style={{
-                padding: '32px',
+                padding: 'clamp(20px, 3vw, 32px)',
                 borderRadius: '24px'
               }}
             >
@@ -152,51 +189,56 @@ export default function AboutSection() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
-                  marginBottom: '22px',
-                  color: '#ffffff',
+                  marginBottom: '20px',
                   fontFamily: 'Syne, sans-serif',
                   fontSize: '17px',
-                  fontWeight: 700
+                  fontWeight: 700,
+                  color: 'var(--text-primary)'
                 }}
               >
-                <GraduationCap size={20} color="#00d2ff" />
+                <GraduationCap size={20} color="var(--brand-blue)" />
                 <span>Academic Credentials</span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '22px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {education.map((edu) => (
                   <div
                     key={edu.degree}
                     style={{
-                      borderLeft: '2px solid rgba(0, 210, 255, 0.4)',
-                      paddingLeft: '16px'
+                      padding: '16px',
+                      borderRadius: '16px',
+                      background: isLight ? 'rgba(241, 245, 249, 0.65)' : 'rgba(30, 41, 59, 0.4)',
+                      border: '1px solid var(--border-subtle)'
                     }}
                   >
                     <div
                       style={{
                         display: 'flex',
-                        alignItems: 'center',
+                        flexWrap: 'wrap',
                         justifyContent: 'space-between',
+                        alignItems: 'baseline',
+                        gap: '6px',
                         marginBottom: '4px'
                       }}
                     >
-                      <h4
+                      <div
                         style={{
+                          fontFamily: 'Syne, sans-serif',
                           fontSize: '15px',
-                          color: '#ffffff',
-                          fontWeight: 700
+                          fontWeight: 700,
+                          color: 'var(--text-primary)'
                         }}
                       >
                         {edu.degree}
-                      </h4>
+                      </div>
                       <span
                         style={{
                           fontFamily: 'JetBrains Mono, monospace',
                           fontSize: '12px',
                           fontWeight: 700,
-                          color: '#00d2ff',
-                          backgroundColor: 'rgba(0, 210, 255, 0.12)',
-                          padding: '3px 10px',
+                          color: 'var(--brand-blue)',
+                          backgroundColor: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(0, 210, 255, 0.12)',
+                          padding: '2px 8px',
                           borderRadius: '9999px'
                         }}
                       >
@@ -204,35 +246,25 @@ export default function AboutSection() {
                       </span>
                     </div>
 
-                    <div
-                      style={{
-                        fontSize: '13.5px',
-                        fontWeight: 600,
-                        color: '#38bdf8',
-                        marginBottom: '4px'
-                      }}
-                    >
-                      {edu.institution} ({edu.period})
+                    <div style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                      {edu.institution}
                     </div>
 
-                    <div
-                      style={{
-                        fontSize: '12.5px',
-                        color: '#94a3b8'
-                      }}
-                    >
-                      {edu.focus}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                      <span>{edu.period}</span>
+                      <span>•</span>
+                      <span style={{ color: '#10b981', fontWeight: 600 }}>{edu.status}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Certifications Card */}
+            {/* Verified Certifications & Experience Badges */}
             <div
               className="modern-card"
               style={{
-                padding: '28px',
+                padding: 'clamp(20px, 3vw, 32px)',
                 borderRadius: '24px'
               }}
             >
@@ -242,51 +274,38 @@ export default function AboutSection() {
                   alignItems: 'center',
                   gap: '10px',
                   marginBottom: '18px',
-                  color: '#ffffff',
                   fontFamily: 'Syne, sans-serif',
                   fontSize: '17px',
-                  fontWeight: 700
+                  fontWeight: 700,
+                  color: 'var(--text-primary)'
                 }}
               >
-                <Award size={20} color="#f59e0b" />
-                <span>Industry Accreditations</span>
+                <Award size={20} color="#10b981" />
+                <span>Verified Industry Experience</span>
               </div>
 
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '12px'
-                }}
-              >
-                {certifications.map((cert) => (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+                {certifications.map((c) => (
                   <div
-                    key={cert.title}
+                    key={c.title}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      padding: '14px',
-                      borderRadius: '14px'
+                      padding: '12px 14px',
+                      borderRadius: '14px',
+                      background: isLight ? 'rgba(241, 245, 249, 0.65)' : 'rgba(30, 41, 59, 0.4)',
+                      border: '1px solid var(--border-subtle)',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px'
                     }}
                   >
-                    <div
-                      style={{
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        color: '#ffffff',
-                        marginBottom: '4px'
-                      }}
-                    >
-                      {cert.title}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#94a3b8',
-                        fontFamily: 'JetBrains Mono, monospace'
-                      }}
-                    >
-                      {cert.duration} • {cert.issuer}
+                    <CheckCircle2 size={15} color="#10b981" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        {c.title}
+                      </div>
+                      <div style={{ fontSize: '11.5px', color: 'var(--text-secondary)' }}>
+                        {c.issuer} • {c.duration}
+                      </div>
                     </div>
                   </div>
                 ))}

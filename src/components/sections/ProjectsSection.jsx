@@ -1,29 +1,26 @@
 import React, { useState } from 'react';
 import { portfolioData } from '../../data/portfolioData';
-import { ExternalLink, ArrowUpRight, Sparkles, Layers } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { GithubIcon } from '../common/Icons';
 import { soundFx } from '../../utils/audioEffects';
 
-const GithubIcon = ({ size = 16, color = 'currentColor' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
-  </svg>
-);
-
-export default function ProjectsSection() {
+export default function ProjectsSection({ theme = 'light' }) {
   const { projects } = portfolioData;
   const [filter, setFilter] = useState('ALL');
 
-  const categories = ['ALL', '3D Graphics & Creative Web', 'Full Stack & 3D Web', 'Mobile & Fintech', 'GovTech & Security'];
+  const categories = ['ALL', 'Full Stack & 3D Web', 'Mobile & Fintech', 'GovTech & Security', '3D Graphics & Creative Web'];
 
   const filteredProjects =
     filter === 'ALL' ? projects : projects.filter((p) => p.category === filter);
+
+  const isLight = theme === 'light';
 
   return (
     <section
       id="projects"
       style={{
         position: 'relative',
-        padding: '100px 24px',
+        padding: '100px 20px',
         backgroundColor: 'transparent'
       }}
     >
@@ -42,8 +39,8 @@ export default function ProjectsSection() {
             flexWrap: 'wrap',
             alignItems: 'flex-end',
             justifyContent: 'space-between',
-            gap: '24px',
-            marginBottom: '48px'
+            gap: '20px',
+            marginBottom: '44px'
           }}
         >
           <div>
@@ -51,20 +48,20 @@ export default function ProjectsSection() {
               style={{
                 fontFamily: 'JetBrains Mono, monospace',
                 fontSize: '12px',
-                color: '#00d2ff',
+                color: 'var(--brand-blue)',
                 fontWeight: 600,
                 letterSpacing: '1px',
-                marginBottom: '10px'
+                marginBottom: '8px'
               }}
             >
-              03 // SELECT WORK
+              03 // PRODUCTION SHOWCASE
             </div>
             <h2
               style={{
-                fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
-                color: '#ffffff',
+                fontSize: 'clamp(2.1rem, 3.8vw, 3rem)',
+                color: 'var(--text-primary)',
                 fontWeight: 800,
-                letterSpacing: '-0.02em'
+                letterSpacing: '-0.025em'
               }}
             >
               Featured <span className="gradient-text-cyan">Projects</span>
@@ -79,7 +76,7 @@ export default function ProjectsSection() {
                 <button
                   key={cat}
                   onClick={() => {
-                    soundFx.playChirp(700);
+                    soundFx.playChirp(650);
                     setFilter(cat);
                   }}
                   style={{
@@ -88,9 +85,13 @@ export default function ProjectsSection() {
                     fontFamily: 'Plus Jakarta Sans, sans-serif',
                     fontWeight: 600,
                     borderRadius: '9999px',
-                    backgroundColor: active ? '#00d2ff' : 'rgba(255, 255, 255, 0.05)',
-                    border: `1px solid ${active ? '#00d2ff' : 'rgba(255, 255, 255, 0.1)'}`,
-                    color: active ? '#030712' : '#94a3b8',
+                    backgroundColor: active
+                      ? 'var(--brand-blue)'
+                      : isLight
+                      ? 'rgba(241, 245, 249, 0.85)'
+                      : 'rgba(30, 41, 59, 0.6)',
+                    border: `1px solid ${active ? 'var(--brand-blue)' : 'var(--border-subtle)'}`,
+                    color: active ? '#ffffff' : 'var(--text-secondary)',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease'
                   }}
@@ -102,12 +103,12 @@ export default function ProjectsSection() {
           </div>
         </div>
 
-        {/* Project Cards Grid */}
+        {/* Projects Responsive Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-            gap: '28px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
+            gap: '24px'
           }}
         >
           {filteredProjects.map((proj) => (
@@ -116,57 +117,56 @@ export default function ProjectsSection() {
               className="modern-card"
               style={{
                 borderRadius: '24px',
-                padding: '32px',
+                padding: 'clamp(22px, 3vw, 32px)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
-                minHeight: '390px'
+                gap: '20px'
               }}
             >
               <div>
-                {/* Category & Badge */}
+                {/* Top Badge & Category */}
                 <div
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '18px'
+                    marginBottom: '14px'
                   }}
                 >
                   <span
                     style={{
-                      fontFamily: 'JetBrains Mono, monospace',
-                      fontSize: '11px',
-                      color: '#00d2ff',
-                      fontWeight: 600
-                    }}
-                  >
-                    {proj.category}
-                  </span>
-
-                  <span
-                    style={{
-                      fontSize: '10px',
+                      fontSize: '10.5px',
                       fontFamily: 'JetBrains Mono, monospace',
                       fontWeight: 700,
-                      color: '#f59e0b',
-                      backgroundColor: 'rgba(245, 158, 11, 0.12)',
-                      border: '1px solid rgba(245, 158, 11, 0.25)',
                       padding: '3px 10px',
-                      borderRadius: '9999px'
+                      borderRadius: '9999px',
+                      backgroundColor: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(0, 210, 255, 0.12)',
+                      color: 'var(--brand-blue)',
+                      border: '1px solid var(--border-subtle)'
                     }}
                   >
                     {proj.badge}
                   </span>
+
+                  <span
+                    style={{
+                      fontSize: '11.5px',
+                      color: 'var(--text-muted)',
+                      fontFamily: 'JetBrains Mono, monospace'
+                    }}
+                  >
+                    {proj.category}
+                  </span>
                 </div>
 
-                {/* Title */}
+                {/* Title & Subtitle */}
                 <h3
                   style={{
                     fontFamily: 'Syne, sans-serif',
-                    fontSize: '1.4rem',
-                    color: '#ffffff',
+                    fontSize: '1.45rem',
                     fontWeight: 700,
+                    color: 'var(--text-primary)',
                     marginBottom: '6px'
                   }}
                 >
@@ -175,10 +175,10 @@ export default function ProjectsSection() {
 
                 <div
                   style={{
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 600,
-                    color: '#38bdf8',
-                    marginBottom: '16px'
+                    color: 'var(--brand-blue)',
+                    marginBottom: '14px'
                   }}
                 >
                   {proj.subtitle}
@@ -187,37 +187,38 @@ export default function ProjectsSection() {
                 {/* Description */}
                 <p
                   style={{
-                    fontSize: '0.96rem',
-                    lineHeight: 1.6,
-                    color: '#94a3b8',
-                    marginBottom: '24px'
+                    fontSize: '0.94rem',
+                    lineHeight: 1.65,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '20px'
                   }}
                 >
                   {proj.description}
                 </p>
               </div>
 
+              {/* Bottom: Tech Tags & Action Links */}
               <div>
-                {/* Tech Pills */}
+                {/* Tech Chips */}
                 <div
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: '6px',
-                    marginBottom: '24px'
+                    marginBottom: '20px'
                   }}
                 >
                   {proj.tech.map((t) => (
                     <span
                       key={t}
                       style={{
+                        fontSize: '11.5px',
                         fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: '11px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        color: '#cbd5e1',
                         padding: '4px 10px',
-                        borderRadius: '9999px'
+                        borderRadius: '8px',
+                        backgroundColor: isLight ? 'rgba(241, 245, 249, 0.85)' : 'rgba(30, 41, 59, 0.5)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)'
                       }}
                     >
                       {t}
@@ -225,46 +226,37 @@ export default function ProjectsSection() {
                   ))}
                 </div>
 
-                {/* Actions */}
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                    paddingTop: '20px'
-                  }}
-                >
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '10px' }}>
                   <a
-                    href="https://github.com/aadiverma4206"
+                    href={portfolioData.personal.github}
                     target="_blank"
-                    rel="noreferrer"
-                    onClick={() => soundFx.playLaser()}
+                    rel="noopener noreferrer"
+                    onClick={() => soundFx.playChirp(700)}
                     className="modern-btn-secondary"
                     style={{
-                      padding: '10px 18px',
-                      fontSize: '13px',
                       flex: 1,
-                      justifyContent: 'center'
+                      padding: '10px 16px',
+                      fontSize: '12.5px',
+                      gap: '6px'
                     }}
                   >
-                    <GithubIcon size={15} />
-                    <span>Code</span>
+                    <GithubIcon size={14} />
+                    <span>Source Code</span>
                   </a>
 
                   <a
                     href="#contact"
-                    onClick={() => soundFx.playChirp(850)}
+                    onClick={() => soundFx.playChirp(650)}
                     className="modern-btn-primary"
                     style={{
                       padding: '10px 18px',
-                      fontSize: '13px',
-                      flex: 1,
-                      justifyContent: 'center'
+                      fontSize: '12.5px',
+                      gap: '6px'
                     }}
                   >
-                    <span>Inquire</span>
-                    <ArrowUpRight size={15} />
+                    <span>Inspect</span>
+                    <ArrowUpRight size={14} />
                   </a>
                 </div>
               </div>

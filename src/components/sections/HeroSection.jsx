@@ -2,26 +2,18 @@ import React, { useState } from 'react';
 import { portfolioData } from '../../data/portfolioData';
 import NewElementCore from '../3d/NewElementCore';
 import { soundFx } from '../../utils/audioEffects';
-import { ArrowRight, Sparkles, Terminal, Image as ImageIcon, CheckCircle2, Shield } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle2, MapPin, Image as ImageIcon } from 'lucide-react';
 
-export default function HeroSection({
-  onPulseTriggered,
-  useEditedPhoto = true,
-  onTogglePhoto,
-  backdropIntensity = 'vivid',
-  onChangeIntensity
-}) {
+export default function HeroSection({ theme = 'light' }) {
   const { personal, stats } = portfolioData;
-  const [photoScanning, setPhotoScanning] = useState(false);
+  const [useEditedPhoto, setUseEditedPhoto] = useState(false);
 
-  const togglePhotoStyle = () => {
-    soundFx.playChirp(820);
-    setPhotoScanning(true);
-    setTimeout(() => {
-      if (onTogglePhoto) onTogglePhoto();
-      setPhotoScanning(false);
-    }, 280);
+  const togglePhoto = () => {
+    soundFx.playChirp(680);
+    setUseEditedPhoto((p) => !p);
   };
+
+  const isLight = theme === 'light';
 
   return (
     <section
@@ -29,8 +21,8 @@ export default function HeroSection({
       style={{
         position: 'relative',
         minHeight: '100vh',
-        paddingTop: '120px',
-        paddingBottom: '80px',
+        paddingTop: '130px',
+        paddingBottom: '70px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -41,7 +33,7 @@ export default function HeroSection({
         style={{
           maxWidth: '1280px',
           margin: '0 auto',
-          padding: '0 24px',
+          padding: '0 20px',
           width: '100%',
           position: 'relative',
           zIndex: 10
@@ -51,14 +43,16 @@ export default function HeroSection({
         <div
           style={{
             display: 'inline-flex',
+            flexWrap: 'wrap',
             alignItems: 'center',
             gap: '10px',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            backdropFilter: 'blur(20px)',
+            background: isLight ? 'rgba(255, 255, 255, 0.85)' : 'rgba(15, 23, 42, 0.85)',
+            border: '1px solid var(--border-medium)',
+            backdropFilter: 'blur(16px)',
             padding: '6px 16px',
             borderRadius: '9999px',
-            marginBottom: '32px'
+            marginBottom: '28px',
+            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)'
           }}
         >
           <span
@@ -74,125 +68,125 @@ export default function HeroSection({
             style={{
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: '12px',
-              fontWeight: 500,
-              color: '#e2e8f0'
+              fontWeight: 600,
+              color: 'var(--text-primary)'
             }}
           >
             AVAILABLE FOR HIGH-IMPACT ARCHITECTURE
           </span>
-          <span style={{ color: 'rgba(255, 255, 255, 0.2)' }}>•</span>
+          <span style={{ color: 'var(--text-muted)' }}>•</span>
           <span
             style={{
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '11px',
-              color: '#00d2ff'
+              fontSize: '11.5px',
+              color: 'var(--brand-blue)',
+              fontWeight: 600
             }}
           >
-            M.Sc. IT (83.59%)
+            M.Sc. IT (83.59% Distinction)
           </span>
         </div>
 
-        {/* Main 2-Column Hero Grid */}
+        {/* Main 2-Column Responsive Grid */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))',
-            gap: '40px',
+            gap: '32px',
             alignItems: 'center'
           }}
         >
-          {/* Left Column: Typography & CTAs */}
+          {/* Left Column: Heading, Bio, CTAs, Metrics */}
           <div
             className="modern-card"
             style={{
-              maxWidth: '620px',
-              padding: '36px',
+              padding: 'clamp(24px, 4vw, 40px)',
               borderRadius: '24px'
             }}
           >
             <h1
               style={{
-                fontSize: 'clamp(2.4rem, 5vw, 4.2rem)',
+                fontSize: 'clamp(2.3rem, 4.5vw, 3.8rem)',
                 lineHeight: 1.15,
                 fontWeight: 800,
                 color: 'var(--text-primary)',
-                marginBottom: '20px',
-                letterSpacing: '-0.02em'
+                marginBottom: '18px',
+                letterSpacing: '-0.025em'
               }}
             >
               Engineering <br />
               <span className="gradient-text-cyan">
-                Immersive 3D
+                Scalable Systems
               </span> <br />
-              &amp; Scalable Systems.
+              &amp; Immersive 3D Web.
             </h1>
 
             <p
               style={{
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
-                fontSize: 'clamp(1rem, 1.8vw, 1.15rem)',
+                fontSize: 'clamp(0.98rem, 1.8vw, 1.12rem)',
                 lineHeight: 1.65,
                 color: 'var(--text-secondary)',
-                marginBottom: '32px',
-                fontWeight: 400
+                marginBottom: '30px'
               }}
             >
-              Hi, I’m <strong style={{ color: 'var(--text-primary)' }}>Aditya Kumar</strong>. Full Stack Architect specializing in high-performance React 19, Three.js 3D WebGL tactical engines, Flutter mobile applications, and resilient enterprise backends.
+              Hi, I’m <strong style={{ color: 'var(--text-primary)' }}>{personal.name}</strong>. Full Stack Architect specializing in high-performance React 19, Three.js 3D WebGL tactical engines, Flutter mobile applications, and resilient cloud architectures.
             </p>
 
-            {/* Modern Action Buttons */}
+            {/* Action Buttons */}
             <div
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '16px',
-                marginBottom: '40px'
+                gap: '14px',
+                marginBottom: '36px'
               }}
             >
               <a
                 href="#projects"
-                onClick={() => soundFx.playLaser()}
+                onClick={() => soundFx.playChirp(700)}
                 className="modern-btn-primary"
               >
-                <span>Explore Projects</span>
-                <ArrowRight size={17} />
+                <span>View Featured Work</span>
+                <ArrowRight size={16} />
               </a>
 
               <a
                 href="#contact"
-                onClick={() => soundFx.playChirp(800)}
+                onClick={() => soundFx.playChirp(600)}
                 className="modern-btn-secondary"
               >
                 <span>Get in Touch</span>
-                <Sparkles size={16} color="#00d2ff" />
+                <Sparkles size={15} color="var(--brand-blue)" />
               </a>
             </div>
 
-            {/* Quick Metrics Bar */}
+            {/* Metrics Row */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
-                gap: '14px'
+                gap: '12px'
               }}
             >
               {stats.slice(0, 3).map((st) => (
                 <div
                   key={st.label}
-                  className="modern-card"
                   style={{
-                    padding: '16px 20px',
-                    borderRadius: '16px'
+                    padding: '14px 16px',
+                    borderRadius: '16px',
+                    background: isLight ? 'rgba(241, 245, 249, 0.7)' : 'rgba(30, 41, 59, 0.45)',
+                    border: '1px solid var(--border-subtle)'
                   }}
                 >
                   <div
                     style={{
                       fontFamily: 'Syne, sans-serif',
-                      fontSize: '1.6rem',
+                      fontSize: '1.5rem',
                       fontWeight: 800,
                       color: 'var(--text-primary)',
                       letterSpacing: '-0.02em',
-                      marginBottom: '4px'
+                      marginBottom: '2px'
                     }}
                   >
                     {st.value}
@@ -201,16 +195,16 @@ export default function HeroSection({
                     style={{
                       fontFamily: 'JetBrains Mono, monospace',
                       fontSize: '11px',
-                      color: 'var(--brand-cyan)',
-                      fontWeight: 500
+                      color: 'var(--brand-blue)',
+                      fontWeight: 600
                     }}
                   >
                     {st.label}
                   </div>
                   <div
                     style={{
-                      fontSize: '12px',
-                      color: 'var(--text-tertiary)',
+                      fontSize: '11.5px',
+                      color: 'var(--text-muted)',
                       marginTop: '2px'
                     }}
                   >
@@ -221,7 +215,7 @@ export default function HeroSection({
             </div>
           </div>
 
-          {/* Right Column: Photorealistic 3D Element & Floating Glass Portrait Card */}
+          {/* Right Column: 3D Core Canvas & Professional Profile Card */}
           <div
             style={{
               display: 'flex',
@@ -229,20 +223,21 @@ export default function HeroSection({
               gap: '24px'
             }}
           >
-            {/* 3D New Element Canvas */}
+            {/* 3D WebGL Canvas Card */}
             <div
               className="modern-card"
               style={{
                 width: '100%',
-                minHeight: '430px',
+                minHeight: '410px',
                 borderRadius: '24px',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                padding: '0'
               }}
             >
-              <NewElementCore onPulseTriggered={onPulseTriggered} />
+              <NewElementCore theme={theme} />
             </div>
 
-            {/* Floating Glassmorphic Portrait Pill Card */}
+            {/* Professional Developer Profile Card */}
             <div
               className="modern-card"
               style={{
@@ -250,11 +245,11 @@ export default function HeroSection({
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 gap: '16px',
-                padding: '16px 20px',
+                padding: '18px 22px',
                 borderRadius: '20px'
               }}
             >
-              {/* Image Preview with Glowing Ring */}
+              {/* Photo Frame */}
               <div
                 style={{
                   position: 'relative',
@@ -262,14 +257,14 @@ export default function HeroSection({
                   height: '64px',
                   borderRadius: '16px',
                   overflow: 'hidden',
-                  border: '2px solid rgba(0, 210, 255, 0.6)',
-                  boxShadow: '0 0 20px rgba(0, 210, 255, 0.35)',
+                  border: '2px solid var(--border-highlight)',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.25)',
                   flexShrink: 0
                 }}
               >
                 <img
                   src={useEditedPhoto ? personal.avatarEdited : personal.avatarOriginal}
-                  alt="Aditya Kumar"
+                  alt={personal.name}
                   style={{
                     width: '100%',
                     height: '100%',
@@ -278,7 +273,7 @@ export default function HeroSection({
                 />
               </div>
 
-              {/* Identity Details */}
+              {/* Identity & Details */}
               <div style={{ flex: 1, minWidth: '180px' }}>
                 <div
                   style={{
@@ -291,7 +286,7 @@ export default function HeroSection({
                   <div
                     style={{
                       fontFamily: 'Syne, sans-serif',
-                      fontSize: '15px',
+                      fontSize: '16px',
                       fontWeight: 700,
                       color: 'var(--text-primary)'
                     }}
@@ -305,75 +300,51 @@ export default function HeroSection({
                       color: '#10b981',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '4px'
+                      gap: '4px',
+                      fontWeight: 600
                     }}
                   >
-                    <CheckCircle2 size={12} /> Verified
+                    <CheckCircle2 size={13} /> Verified
                   </span>
                 </div>
 
                 <div
                   style={{
-                    fontSize: '13px',
+                    fontSize: '12.5px',
                     color: 'var(--text-secondary)',
-                    marginBottom: '8px'
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
-                  M.Sc. IT (PRSU) • Botivate Services LLP
+                  <MapPin size={12} color="var(--brand-blue)" />
+                  <span>{personal.location}</span>
                 </div>
 
-                {/* Photo Toggle & Visibility Buttons */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                {/* Photo switch button */}
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                   <button
-                    onClick={togglePhotoStyle}
+                    onClick={togglePhoto}
                     style={{
                       padding: '5px 12px',
                       fontSize: '11px',
                       borderRadius: '9999px',
-                      background: 'rgba(0, 210, 255, 0.12)',
-                      border: '1px solid rgba(0, 210, 255, 0.35)',
-                      color: '#00d2ff',
+                      background: isLight ? 'rgba(37, 99, 235, 0.08)' : 'rgba(0, 210, 255, 0.12)',
+                      border: '1px solid var(--border-medium)',
+                      color: 'var(--brand-blue)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '6px',
                       fontFamily: 'Plus Jakarta Sans, sans-serif',
-                      fontWeight: 600
+                      fontWeight: 600,
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     <ImageIcon size={12} />
-                    <span>{useEditedPhoto ? 'View Raw Photo' : 'View Stark Hologram'}</span>
+                    <span>{useEditedPhoto ? 'Switch to Original' : 'Switch to Studio Portrait'}</span>
                   </button>
-
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    {[
-                      { id: 'cinematic', label: 'Ultra' },
-                      { id: 'vivid', label: 'Vivid' },
-                      { id: 'normal', label: 'Soft' }
-                    ].map((lvl) => (
-                      <button
-                        key={lvl.id}
-                        onClick={() => {
-                          soundFx.playChirp(750);
-                          if (onChangeIntensity) onChangeIntensity(lvl.id);
-                        }}
-                        style={{
-                          padding: '4px 8px',
-                          fontSize: '10px',
-                          borderRadius: '6px',
-                          background:
-                            backdropIntensity === lvl.id
-                              ? 'rgba(255, 255, 255, 0.2)'
-                              : 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: backdropIntensity === lvl.id ? '#ffffff' : '#94a3b8',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {lvl.label}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>
